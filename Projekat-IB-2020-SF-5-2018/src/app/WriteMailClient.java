@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.security.KeyStore;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.cert.Certificate;
 
 import javax.crypto.Cipher;
@@ -14,6 +15,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.xml.security.utils.JavaUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import com.google.api.services.gmail.Gmail;
 
@@ -27,9 +29,9 @@ import support.MailWritter;
 
 public class WriteMailClient extends MailClient {
 
-	private static final String KEY_FILE = "./data/session.key";
-	private static final String IV1_FILE = "./data/iv1.bin";
-	private static final String IV2_FILE = "./data/iv2.bin";
+//	private static final String KEY_FILE = "./data/session.key";
+//	private static final String IV1_FILE = "./data/iv1.bin";
+//	private static final String IV2_FILE = "./data/iv2.bin";
 	
 	public static void main(String[] args) {
 		
@@ -81,13 +83,14 @@ public class WriteMailClient extends MailClient {
 			PublicKey userbPublicKey = keyStore.getCertificate("sima").getPublicKey();
 			
 			//kriptovanje tajnog kljuca
+			Security.addProvider(new BouncyCastleProvider());
 			Cipher rsaCipherEnc = Cipher.getInstance("RSA/ECB/PKCS1Padding", "BC");
 			rsaCipherEnc.init(Cipher.ENCRYPT_MODE, userbPublicKey);
-			byte[] secretKeyEnc = rsaCipherEnc.doFinal(secretKey.getEncoded());
+			byte[] cipherSecretKey = rsaCipherEnc.doFinal(secretKey.getEncoded());
 //			String secretKeyEncString = Base64.encodeToString(secretKeyEnc);
 			
 			//kreiranje mail body-a
-			MailBody mailBody = new MailBody(ciphertext, ivParameterSpec1.getIV(), ivParameterSpec2.getIV(), secretKeyEnc);
+			MailBody mailBody = new MailBody(ciphertext, ivParameterSpec1.getIV(), ivParameterSpec2.getIV(), cipherSecretKey);
 			
 			//snimaju se bajtovi kljuca i IV.
 //			JavaUtils.writeBytesToFilename(KEY_FILE, secretKey.getEncoded());
