@@ -64,8 +64,8 @@ public class WriteMailClient extends MailClient {
 			
 			//sifrovanje
 			byte[] ciphertext = aesCipherEnc.doFinal(compressedBody.getBytes());
-			String ciphertextStr = Base64.encodeToString(ciphertext);
-			System.out.println("Kriptovan tekst: " + ciphertextStr);
+//			String ciphertextStr = Base64.encodeToString(ciphertext);
+			System.out.println("Kriptovan tekst: " + Base64.encodeToString(ciphertext));
 			
 			
 			//inicijalizacija za sifrovanje 
@@ -84,11 +84,10 @@ public class WriteMailClient extends MailClient {
 			Cipher rsaCipherEnc = Cipher.getInstance("RSA/ECB/PKCS1Padding", "BC");
 			rsaCipherEnc.init(Cipher.ENCRYPT_MODE, userbPublicKey);
 			byte[] secretKeyEnc = rsaCipherEnc.doFinal(secretKey.getEncoded());
-			String secretKeyEncString = Base64.encodeToString(secretKeyEnc);
+//			String secretKeyEncString = Base64.encodeToString(secretKeyEnc);
 			
 			//kreiranje mail body-a
-			MailBody mailBody = new MailBody(ciphertextStr, new String(ivParameterSpec1.getIV()), 
-					new String(ivParameterSpec2.getIV()), secretKeyEncString);
+			MailBody mailBody = new MailBody(ciphertext, ivParameterSpec1.getIV(), ivParameterSpec2.getIV(), secretKeyEnc);
 			
 			//snimaju se bajtovi kljuca i IV.
 //			JavaUtils.writeBytesToFilename(KEY_FILE, secretKey.getEncoded());
