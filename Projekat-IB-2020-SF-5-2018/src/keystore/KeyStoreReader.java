@@ -27,7 +27,7 @@ public class KeyStoreReader {
 	 * 
 	 * @return Instanca KeyStore objekta
 	 */
-	public KeyStore readKeyStore(String keyStoreFilePath, char[] password) {
+	public static KeyStore readKeyStore(String keyStoreFilePath, char[] password) {
 		KeyStore keyStore = null;
 		try {
 			// kreiramo instancu KeyStore objekta. 
@@ -62,7 +62,7 @@ public class KeyStoreReader {
 	 * 
 	 * @return Sertifikat
 	 */
-	public Certificate getCertificateFromKeyStore(KeyStore keyStore, String alias) {
+	public static Certificate getCertificateFromKeyStore(KeyStore keyStore, String alias) {
 		Certificate certificate = null;
 		try {
 			certificate = keyStore.getCertificate(alias);
@@ -86,7 +86,7 @@ public class KeyStoreReader {
 	 *  
 	 * @return Privatni kljuc
 	 */
-	public PrivateKey getPrivateKeyFromKeyStore(KeyStore keyStore, String alias, char[] keyPass) {
+	public static PrivateKey getPrivateKeyFromKeyStore(KeyStore keyStore, String alias, char[] keyPass) {
 		PrivateKey privateKey = null;
 		try {
 			privateKey = (PrivateKey) keyStore.getKey(alias, keyPass);
@@ -107,7 +107,7 @@ public class KeyStoreReader {
 	 * @param certificate - sertifikat iz kojeg zelimo da procitamo javni kljuc
 	 * @return
 	 */
-	public PublicKey getPublicKeyFromCertificate(Certificate certificate) {
+	public static PublicKey getPublicKeyFromCertificate(Certificate certificate) {
 		return certificate.getPublicKey();
 	}
 
