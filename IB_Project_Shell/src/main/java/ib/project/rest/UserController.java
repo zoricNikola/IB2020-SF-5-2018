@@ -25,6 +25,10 @@ public class UserController {
 	
 	@PostMapping(consumes = "application/json")
 	public ResponseEntity<UserDTO> saveUser(@RequestBody UserDTO userDTO) {
+		
+		if (userService.findByEmail(userDTO.getEmail()) != null)
+			return new ResponseEntity<UserDTO>(HttpStatus.CONFLICT);
+		
 		User user = new User();
 		user.setEmail(userDTO.getEmail());
 		user.setPassword(userDTO.getPassword());
