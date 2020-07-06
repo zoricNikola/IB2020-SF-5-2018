@@ -1,0 +1,13 @@
+package ib.project.service;
+
+import ib.project.model.User;
+
+public interface UserServiceInterface {
+
+	User findOne(Long userId);
+	
+	User findByEmail(String email);
+	
+	User save(User user);
+	
+}
