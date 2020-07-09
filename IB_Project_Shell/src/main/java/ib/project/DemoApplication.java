@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import ib.project.certificate.CertificateGenerator;
 import ib.project.rest.DemoController;
 
 @SpringBootApplication
@@ -35,6 +36,15 @@ public class DemoApplication {
 			logger.info("Folder with user files: " + path);
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		
+		// check for root CA KeyStore
+		File f = new File("./data/root.jks");
+		if (!f.exists()) {
+			CertificateGenerator.generateMyRootCA();
+		}
+		else {
+			System.out.println("Root CA already exists");
 		}
 	}
 }
