@@ -1,5 +1,9 @@
 package ib.project.rest;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.ArrayList;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ib.project.certificate.CertificateGenerator;
 import ib.project.certificate.CertificateReader;
 import ib.project.dto.UserDTO;
+import ib.project.keystore.KeyStoreReader;
 import ib.project.model.User;
 import ib.project.service.AuthorityServiceInterface;
 import ib.project.service.UserServiceInterface;
@@ -129,6 +134,21 @@ public class UserController {
 		} catch (CertificateEncodingException e) {
 			e.printStackTrace();
 		}
+
+		return new ResponseEntity<byte[]>(HttpStatus.BAD_REQUEST);
+	}
+	
+	@GetMapping(path = "/downloadKeyStore/{email}")
+	public ResponseEntity<byte[]> downloadKeyStore(@PathVariable("email") String email) {
+		User user = userService.findByEmail(email);
+		if (user == null)
+			return new ResponseEntity<byte[]>(HttpStatus.BAD_REQUEST);
+			
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add("filename", user.getId() + ".jks");
+		
+		byte[] bFile = DemoController.readBytesFromFile("./data/" + user.getId() + ".jks");
 
 		return ResponseEntity.ok().headers(headers).body(bFile);
 	}

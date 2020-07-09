@@ -1,7 +1,10 @@
 package ib.project.keystore;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
@@ -11,7 +14,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 
 import ib.project.model.IssuerData;
-import ib.project.model.User;
 
 // KEY STORE PASSWORD FOR ALL: password
 
@@ -29,6 +31,7 @@ public class KeyStoreReader {
 			e.printStackTrace();
 			System.err.println("Exception reading KeyStore from file");
 		}
+		
 		return keyStore;
 	}
 	

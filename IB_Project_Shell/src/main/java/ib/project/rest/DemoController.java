@@ -60,7 +60,7 @@ public class DemoController {
 		return ResponseEntity.ok().headers(headers).body(bFile);
 	}
 
-	private static byte[] readBytesFromFile(String filePath) {
+	public static byte[] readBytesFromFile(String filePath) {
 
 		FileInputStream fileInputStream = null;
 		byte[] bytesArray = null;
