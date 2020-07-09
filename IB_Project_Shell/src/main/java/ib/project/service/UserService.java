@@ -34,4 +34,9 @@ public class UserService implements UserServiceInterface {
 		return userRepository.findByActive(active);
 	}
 
+	@Override
+	public List<User> searchByEmail(String email) {
+		return userRepository.findByEmailIgnoreCaseContaining(email);
+	}
+
 }

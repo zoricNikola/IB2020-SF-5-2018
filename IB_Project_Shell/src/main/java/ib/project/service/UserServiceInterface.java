@@ -12,6 +12,8 @@ public interface UserServiceInterface {
 	
 	List<User> findByActive(boolean active);
 	
+	List<User> searchByEmail(String email);
+	
 	User save(User user);
 	
 }

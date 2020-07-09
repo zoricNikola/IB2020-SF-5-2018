@@ -36,7 +36,7 @@ $(document).ready(function() {
 			
 			for (var i = 0; i < response.length; i++) {
 				var newRow = '<tr><td>' + response[i].id + '</td><td>' + response[i].email +
-					'</td><td><button type="button" onclick="activate(' + response[i].id + ')">Activate</button>';
+					'</td><td><button type="button" onclick="activate(' + response[i].id + ')">Activate</button></td></tr>';
 				$('table tbody').append(newRow);
 			}
 				
