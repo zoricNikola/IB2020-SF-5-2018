@@ -29,6 +29,9 @@ public class User implements Serializable {
 	@Column(name = "password")
 	private String password;
 	
+	@Column(name = "salt")
+	private String salt;
+	
 	@Column(name = "certificate")
 	private String certificate;
 	
@@ -41,11 +44,12 @@ public class User implements Serializable {
 	
 	public User() {}
 
-	public User(Long id, String email, String password, String certificate, boolean active, Authority authority) {
+	public User(Long id, String email, String password, String salt, String certificate, boolean active, Authority authority) {
 		super();
 		this.id = id;
 		this.email = email;
 		this.password = password;
+		this.salt = salt;
 		this.certificate = certificate;
 		this.active = active;
 		this.authority = authority;
@@ -73,6 +77,14 @@ public class User implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getSalt() {
+		return salt;
+	}
+
+	public void setSalt(String salt) {
+		this.salt = salt;
 	}
 
 	public String getCertificate() {

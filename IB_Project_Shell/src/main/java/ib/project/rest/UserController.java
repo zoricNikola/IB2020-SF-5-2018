@@ -30,6 +30,8 @@ import ib.project.keystore.KeyStoreReader;
 import ib.project.model.User;
 import ib.project.service.AuthorityServiceInterface;
 import ib.project.service.UserServiceInterface;
+import ib.project.util.Base64;
+import ib.project.util.PasswordManager;
 
 @RestController
 @RequestMapping(value = "api/users")
@@ -49,7 +51,13 @@ public class UserController {
 		
 		User user = new User();
 		user.setEmail(userDTO.getEmail());
-		user.setPassword(userDTO.getPassword());
+		
+		String password = userDTO.getPassword();
+		byte[] salt = PasswordManager.generateSalt();
+		user.setSalt(Base64.encodeToString(salt));
+		
+		byte[] hashedPassword = PasswordManager.hashPassword(password, salt);
+		user.setPassword(Base64.encodeToString(hashedPassword));
 		user.setCertificate("");
 		user.setActive(false);
 		user.setAuthority(authorityService.findByName("regular"));

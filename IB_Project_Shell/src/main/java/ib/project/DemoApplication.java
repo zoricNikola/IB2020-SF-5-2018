@@ -43,9 +43,6 @@ public class DemoApplication {
 		if (!f.exists()) {
 			CertificateGenerator.generateMyRootCA();
 		}
-		else {
-			System.out.println("Root CA already exists");
-		}
 	}
 }
  

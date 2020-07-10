@@ -14,6 +14,8 @@ public class UserDTO implements Serializable {
 	
 	private String password;
 	
+	private String salt;
+	
 	private String certificate;
 	
 	private boolean active;
@@ -22,18 +24,19 @@ public class UserDTO implements Serializable {
 	
 	public UserDTO() {}
 
-	public UserDTO(Long id, String email, String password, String certificate, boolean active, AuthorityDTO authority) {
+	public UserDTO(Long id, String email, String password, String salt, String certificate, boolean active, AuthorityDTO authority) {
 		super();
 		this.id = id;
 		this.email = email;
 		this.password = password;
+		this.salt = salt;
 		this.certificate = certificate;
 		this.active = active;
 		this.authority = authority;
 	}
 	
 	public UserDTO(User user) {
-		this(user.getId(), user.getEmail(), user.getPassword(), user.getCertificate(), user.isActive(), new AuthorityDTO(user.getAuthority()));
+		this(user.getId(), user.getEmail(), user.getPassword(), user.getSalt(), user.getCertificate(), user.isActive(), new AuthorityDTO(user.getAuthority()));
 	}
 
 	public Long getId() {
@@ -58,6 +61,14 @@ public class UserDTO implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getSalt() {
+		return salt;
+	}
+
+	public void setSalt(String salt) {
+		this.salt = salt;
 	}
 
 	public String getCertificate() {
