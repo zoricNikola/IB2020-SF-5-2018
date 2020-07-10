@@ -1,1 +1,9 @@
 # IB2020-SF-5-2018
+
+Web aplikacija nije skroz završena.
+Web aplikacija pruža sve funkcionalnosti koje su tražene projektnom specifikacijom, ali security deo uopšte nije uveden. Aplikacija se vrlo jednostavno koristi, na index strani postoje linkovi koji vode ka stranici za registraciju, odobravanje novih naloga, listi korisnika odakle se mogu preuzeti njihovi sertifikati, kao i stranica za preuzimanje sopstvenog key store-a.
+
+Klijentska aplikacija se koristi kroz klase WriteMailClient i ReadMailClient. Prilikom pokretanja ovih programa prvo se traži unos mail-a koji će se koristiti. Uneti mail se koristi za slanje rest zahteva web aplikaciji, koja kao rezultat vraća putanju, odnosno ime key store-a koji je vezan za taj uneti mail. Da bi sve funkcionisalo kako treba, potrebno je prilikom OAUTH autentifikacije izabrati baš onaj mail koji je na početku unet. Program je podešen tako da ni u jednom trenutku ne zahteva šifre za key store-ove ili privatne ključeve, sve je urađeno programski, doduše postoji samo jedna šifra koja se koristi za sve radi jednostavnosti - "password".
+
+Klijentska aplikacija ima problema sa google verifikacijom i moguće je da neće moći u potpunosti da se demonstrira rad iste.
+Google mi dozvoljava da se prijavim samo sa jednim mail nalogom, dok mi za druge ne pruža tu mogućnost - putem OAUTH autentifikacije samo za jedan svoj mail nalog dobijam mogućnost da izvršim autentifikaciju do kraja, što mi omogućava da pošaljem poruku na drugi nalog, ali ne i da sa drugog pročitam istu. Čitanje mail-a sam testirao tako što sam izmenio ReadMailClient klasu tako da umesto da preuzima poruke sa gmail-a, jednostavno postavljam "hardkodirane" vrednosti koje kopiram iz gmail aplikacije. Ovo nije ostavljeno tako u projektu, već je sve vraćeno na staro kako i treba da bude.
