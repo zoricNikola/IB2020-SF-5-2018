@@ -87,6 +87,14 @@ public class UserController {
 		return new ResponseEntity<List<UserDTO>>(usersDTO, HttpStatus.OK);
 	}
 	
+	@GetMapping(path = "/getKeyStorePath/{email}")
+	public ResponseEntity<String> getKeyStorePath(@PathVariable("email") String email) {
+		User user = userService.findByEmail(email);
+		String path = "./data/" + user.getId() + ".jks";
+		
+		return new ResponseEntity<String>(path, HttpStatus.OK);
+	}
+	
 	@GetMapping(path = "/inactive")
 	public ResponseEntity<List<UserDTO>> getInactiveUsers() {
 		List<User> inactiveUsers = userService.findByActive(false);

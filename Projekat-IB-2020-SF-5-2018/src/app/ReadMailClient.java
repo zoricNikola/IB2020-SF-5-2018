@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -25,6 +26,12 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.apache.log4j.varia.NullAppender;
 import org.apache.xml.security.utils.JavaUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -37,6 +44,7 @@ import support.MailHelper;
 import support.MailReader;
 import util.Base64;
 import util.GzipUtil;
+import util.SignatureManager;
 
 public class ReadMailClient extends MailClient {
 
@@ -46,9 +54,28 @@ public class ReadMailClient extends MailClient {
 //	private static final String KEY_FILE = "./data/session.key";
 //	private static final String IV1_FILE = "./data/iv1.bin";
 //	private static final String IV2_FILE = "./data/iv2.bin";
+	private static char[] password = "password".toCharArray();
 	
 	public static void main(String[] args) throws IOException, InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException, IllegalBlockSizeException, BadPaddingException, MessagingException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchProviderException {
         // Build a new authorized API client service.
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    	System.out.println("Insert your email:");
+        String reciever = reader.readLine();
+        
+        org.apache.log4j.BasicConfigurator.configure(new NullAppender());
+        
+        String url = "http://localhost:8443/api/users/getKeyStorePath/" + reciever;
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        HttpGet request = new HttpGet(url);
+        request.addHeader("accept", "application/json");
+        
+        HttpResponse response = httpClient.execute(request);
+        if (response.getStatusLine().getStatusCode() != 200)
+        	throw new RuntimeException("Error getting certificate path from server");
+        
+        HttpEntity entity = response.getEntity();
+        String keyStorePath = EntityUtils.toString(entity);
+		
         Gmail service = getGmailService();
         ArrayList<MimeMessage> mimeMessages = new ArrayList<MimeMessage>();
         
@@ -78,7 +105,6 @@ public class ReadMailClient extends MailClient {
         }
         
         System.out.println("Select a message to decrypt:");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 	        
 	    String answerStr = reader.readLine();
 	    Integer answer = Integer.parseInt(answerStr);
@@ -87,16 +113,18 @@ public class ReadMailClient extends MailClient {
 	    
 //      kreiranje mailBody-a
 		
+		String sender = chosenMessage.getHeader("From", null).split("@")[0];
 		String mailBodyCSV = MailHelper.getText(chosenMessage);
 		MailBody mailBody = new MailBody(mailBodyCSV);
 		byte[] cipherText = mailBody.getEncMessageBytes();
 		byte[] cipherSecretKey = mailBody.getEncKeyBytes();
+		byte[] signature = mailBody.getSignatureBytes();
 		IvParameterSpec ivParameterSpec1 = new IvParameterSpec(mailBody.getIV1Bytes());
 		IvParameterSpec ivParameterSpec2 = new IvParameterSpec(mailBody.getIV2Bytes());
 		
 //		dobavljanje privatnog kljuca korisnika B
-		KeyStore keyStore = KeyStoreReader.readKeyStore("./data/userb.jks", "userb".toCharArray());
-		PrivateKey userbPrivateKey = KeyStoreReader.getPrivateKeyFromKeyStore(keyStore, "sima", "userb".toCharArray());
+		KeyStore keyStore = KeyStoreReader.readKeyStore(keyStorePath, password);
+		PrivateKey userbPrivateKey = KeyStoreReader.getPrivateKeyFromKeyStore(keyStore, "certificate", password);
 		
 //		dekriptovanje tajnog kljuca
 		Security.addProvider(new BouncyCastleProvider());
@@ -126,11 +154,19 @@ public class ReadMailClient extends MailClient {
 //		String str = MailHelper.getText(chosenMessage);
 //		byte[] bodyEnc = Base64.decode(str);
 		
+		try {
+			PublicKey useraPublicKey = keyStore.getCertificate(sender).getPublicKey();
+			if (SignatureManager.verify(cipherText, signature, useraPublicKey))
+				System.out.println("Message verified!");
+			else 
+				System.out.println("Message not veriefed!!!");
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		}
+		
 		String compressedBody = new String(aesCipherDec.doFinal(cipherText));
 		String bodyText = GzipUtil.decompress(Base64.decode(compressedBody));
 		System.out.println("Body text: " + bodyText);
-		
-		
 
 	}
 }
