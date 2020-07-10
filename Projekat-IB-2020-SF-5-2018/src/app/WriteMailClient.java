@@ -80,20 +80,20 @@ public class WriteMailClient extends MailClient {
             String compressedBody = Base64.encodeToString(GzipUtil.compress(body));
             
             //Key generation
-            KeyGenerator keyGen = KeyGenerator.getInstance("AES"); 
+            KeyGenerator keyGen = KeyGenerator.getInstance("DESede"); 
 			SecretKey secretKey = keyGen.generateKey();
-			Cipher aesCipherEnc = Cipher.getInstance("AES/CBC/PKCS5Padding");
+			Cipher desCipherEnc = Cipher.getInstance("DESede/CBC/PKCS5Padding");
 			
 			//inicijalizacija za sifrovanje 
 			IvParameterSpec ivParameterSpec1 = IVHelper.createIV();
-			aesCipherEnc.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec1);
+			desCipherEnc.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec1);
 			
 			KeyStore keyStore = KeyStoreReader.readKeyStore(keyStorePath, password);
 			PrivateKey privateKey = KeyStoreReader.getPrivateKeyFromKeyStore(keyStore, "certificate", password);
 			
 			
 			//sifrovanje
-			byte[] ciphertext = aesCipherEnc.doFinal(compressedBody.getBytes());
+			byte[] ciphertext = desCipherEnc.doFinal(compressedBody.getBytes());
 //			String ciphertextStr = Base64.encodeToString(ciphertext);
 			System.out.println("Kriptovan tekst: " + Base64.encodeToString(ciphertext));
 			
@@ -103,9 +103,9 @@ public class WriteMailClient extends MailClient {
 			
 			//inicijalizacija za sifrovanje 
 			IvParameterSpec ivParameterSpec2 = IVHelper.createIV();
-			aesCipherEnc.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec2);
+			desCipherEnc.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec2);
 			
-			byte[] ciphersubject = aesCipherEnc.doFinal(compressedSubject.getBytes());
+			byte[] ciphersubject = desCipherEnc.doFinal(compressedSubject.getBytes());
 			String ciphersubjectStr = Base64.encodeToString(ciphersubject);
 			System.out.println("Kriptovan subject: " + ciphersubjectStr);
 			

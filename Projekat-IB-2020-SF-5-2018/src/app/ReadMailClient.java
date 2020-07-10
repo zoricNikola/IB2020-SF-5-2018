@@ -131,25 +131,25 @@ public class ReadMailClient extends MailClient {
 		Cipher rsaCipherDec = Cipher.getInstance("RSA/ECB/PKCS1Padding", "BC");
 		rsaCipherDec.init(Cipher.DECRYPT_MODE, userbPrivateKey);
 		byte[] secretKeyBytes = rsaCipherDec.doFinal(cipherSecretKey);
-		SecretKey secretKey = new SecretKeySpec(secretKeyBytes, "AES");
+		SecretKey secretKey = new SecretKeySpec(secretKeyBytes, "DESede");
 		
-		Cipher aesCipherDec = Cipher.getInstance("AES/CBC/PKCS5Padding");
+		Cipher desCipherDec = Cipher.getInstance("DESede/CBC/PKCS5Padding");
 //		SecretKey secretKey = new SecretKeySpec(JavaUtils.getBytesFromFile(KEY_FILE), "AES");
 		
 //		byte[] iv2 = JavaUtils.getBytesFromFile(IV2_FILE);
 //		IvParameterSpec ivParameterSpec2 = new IvParameterSpec(iv2);
 		//inicijalizacija za dekriptovanje
-		aesCipherDec.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec2);
+		desCipherDec.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec2);
 		
 		//dekompresovanje i dekriptovanje subject-a
 		byte[] cipherSubject = Base64.decode(chosenMessage.getSubject());
-		String compressedSubject = new String(aesCipherDec.doFinal(cipherSubject));
+		String compressedSubject = new String(desCipherDec.doFinal(cipherSubject));
 		String subjectText = GzipUtil.decompress(Base64.decode(compressedSubject));
 		System.out.println("Subject text: " + subjectText);
 		
 //		byte[] iv1 = JavaUtils.getBytesFromFile(IV1_FILE);
 //		IvParameterSpec ivParameterSpec1 = new IvParameterSpec(iv1);
-		aesCipherDec.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec1);
+		desCipherDec.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec1);
 		
 //		String str = MailHelper.getText(chosenMessage);
 //		byte[] bodyEnc = Base64.decode(str);
@@ -164,7 +164,7 @@ public class ReadMailClient extends MailClient {
 			e.printStackTrace();
 		}
 		
-		String compressedBody = new String(aesCipherDec.doFinal(cipherText));
+		String compressedBody = new String(desCipherDec.doFinal(cipherText));
 		String bodyText = GzipUtil.decompress(Base64.decode(compressedBody));
 		System.out.println("Body text: " + bodyText);
 
